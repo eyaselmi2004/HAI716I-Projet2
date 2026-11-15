@@ -106,3 +106,25 @@ Oui, mais de justesse, et seulement avec les parties contre soi-même. Sans elle
 **Impasse 1 : erreur de syntaxe dans la matrice.** Au premier lancement, Python affichait `SyntaxError: invalid syntax` à la ligne 8 de `moteur.py`. J'avais séparé les éléments du dictionnaire `GAINS` par des `;` au lieu de `,`. Corrigé en mettant des virgules.
 
 **Impasse 2 : la partie s'arrêtait après un tour.** Le test donnait `(0, 5)` au lieu de `(18, 23)` : c'est le score d'un seul tour (TFT coopère, ALL-D trahit). Le `return score1, score2` était indenté *dans* la boucle `for`, donc la fonction s'arrêtait dès la fin du 1er tour. Corrigé en mettant le `return` au même niveau que le `for`. Sans le test avec l'exemple du cours, je ne l'aurais pas vu tout de suite.
+
+## 4. Étape 2 : nouvelles stratégies
+
+J'ajoute deux stratégies absentes du cours, choisies parce qu'elles sont opposées sur la question du pardon.
+
+**GRIM (Grim Trigger)**
+- *Règle* : coopère tant que l'adversaire n'a jamais trahi. Dès sa première trahison, trahit jusqu'à la fin de la partie.
+- *Origine* : stratégie classique de la théorie des jeux répétés (Friedman, 1971).
+- *Idée testée* : que se passe-t-il si on ne pardonne jamais ?
+- *Devrait bien jouer contre* : TIT-FOR-TAT et elle-même (coopération totale, 600 points), car aucune des deux ne trahit en premier.
+- *Devrait mal jouer contre* : JOSS : une seule trahison surprise de JOSS et GRIM trahit pour toujours, alors que la coopération aurait pu reprendre.
+
+**TFT-GÉNÉREUX (Generous Tit-for-Tat)**
+- *Règle* : comme TIT-FOR-TAT, mais quand l'adversaire a trahi, elle pardonne une fois sur dix (elle rejoue C au lieu de riposter).
+- *Origine* : Nowak et Sigmund (1992), présentée dans le cours (diapositive 72) comme une solution aux représailles en écho.
+- *Idée testée* : le pardon permet-il de sortir des représailles ?
+- *Devrait bien jouer contre* : JOSS et TESTER : le pardon peut casser l'alternance de représailles vue à l'étape 1 (500 points contre TESTER).
+- *Devrait mal jouer contre* : ALL-D, qui profite de chaque pardon (elle prend 0 point au lieu de 2 à chaque fois).
+
+### Prédiction (écrite avant le lancement)
+
+À l'étape 1, TIT-FOR-TAT était la seule stratégie gentille, et elle ne gagnait que grâce à son match contre elle-même. Avec GRIM et TFT-GÉNÉREUX, il y a maintenant trois stratégies qui ne trahissent jamais en premier : elles devraient coopérer entre elles et marquer 600 points par partie, donc je pense que les trois vont prendre les premières places. Je pense que TFT-GÉNÉREUX sera devant TIT-FOR-TAT, parce que son pardon peut casser l'alternance contre TESTER et les représailles contre JOSS. GRIM devrait être juste derrière, car elle ne pardonne jamais à JOSS. ALL-D devrait descendre au classement : elle marque toujours environ 400 contre ceux qui ripostent, mais les stratégies gentilles marquent maintenant 600 entre elles. RANDOM et JOSS devraient rester en bas.
