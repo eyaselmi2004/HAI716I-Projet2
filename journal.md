@@ -62,10 +62,47 @@ Je pense que TIT-FOR-TAT va gagner, comme dans le tournoi d'Axelrod : elle coop�
 
 ### Résultats
 
-(à compléter après `py etape1.py`)
+Commande : `py etape1.py`
+
+![Résultat de l'étape 1](captures/etape1.png)
+
+    === Avec parties contre soi-même ===
+    1 TIT-FOR-TAT 12042
+    2 ALL-D 11467
+    3 TESTER 11041
+    4 RANDOM 10965
+    5 JOSS 10753
+
+    Score moyen par partie (ligne contre colonne) :
+                    ALL-D   RANDOM TIT-FOR-   TESTER     JOSS
+    ALL-D             400      688      403      400      402
+    RANDOM            208      494      500      501      480
+    TIT-FOR-TAT       398      497      600      500      414
+    TESTER            400      503      500      400      405
+    JOSS              398      521      419      405      408
+
+    === Sans parties contre soi-même ===
+    1 ALL-D 9467
+    2 TIT-FOR-TAT 9056
+    3 TESTER 9042
+    4 JOSS 8721
+    5 RANDOM 8390
+
+### TIT-FOR-TAT gagne-t-elle ?
+
+Oui, mais de justesse, et seulement avec les parties contre soi-même. Sans elles, c'est ALL-D qui gagne. Le tableau des duels explique pourquoi :
+- **TIT-FOR-TAT ne gagne aucun duel**, comme dans le cours : 398 contre 403 face à ALL-D, 500 contre 500 face à TESTER, 414 contre 419 face à JOSS. Elle gagne uniquement grâce à son match contre elle-même (600, le maximum possible). C'est le seul match du tournoi où il y a une coopération totale. Sans ce match, elle repasse derrière ALL-D.
+- **Il n'y a presque pas de stratégies « gentilles » dans la population.** TIT-FOR-TAT est la seule qui ne trahit jamais en premier. Les autres trahissent tout le temps (ALL-D), d'entrée (TESTER), au hasard (RANDOM) ou de temps en temps (JOSS). Le cours dit que TIT-FOR-TAT ne réussit que si elle rencontre assez de stratégies coopératives. En 1980, il y en avait beaucoup ; ici, il n'y en a pas.
+- **ALL-D exploite RANDOM** (688, le plus gros score du tableau) et perd peu contre les autres (environ 400, soit 2 points par tour). Dans une population aussi méfiante, ne jamais coopérer coûte peu.
+- **Les représailles coûtent cher.** Contre TESTER, TIT-FOR-TAT tombe dans une alternance (l'une trahit pendant que l'autre coopère, à tour de rôle) : 500 chacune au lieu de 600. Contre JOSS, les trahisons surprises déclenchent des représailles et les deux finissent autour de 415.
+
+### Comparaison avec ma prédiction
+
+- TIT-FOR-TAT première : **juste**, mais seulement avec les parties contre soi-même, ce que je n'avais pas prévu.
+- TESTER deuxième : **faux**, c'est ALL-D. J'avais sous-estimé ce qu'ALL-D gagne contre RANDOM (688), et le fait que les stratégies qui ripostent ne la punissent pas vraiment : elles la ramènent seulement à 2 points par tour.
+- RANDOM dernière : **faux** avec les parties contre soi-même (c'est JOSS, dont les trahisons surprises font tomber tous ses matchs en représailles), mais **juste** sans elles.
 
 ## Impasses
-
 **Impasse 1 : erreur de syntaxe dans la matrice.** Au premier lancement, Python affichait `SyntaxError: invalid syntax` à la ligne 8 de `moteur.py`. J'avais séparé les éléments du dictionnaire `GAINS` par des `;` au lieu de `,`. Corrigé en mettant des virgules.
 
 **Impasse 2 : la partie s'arrêtait après un tour.** Le test donnait `(0, 5)` au lieu de `(18, 23)` : c'est le score d'un seul tour (TFT coopère, ALL-D trahit). Le `return score1, score2` était indenté *dans* la boucle `for`, donc la fonction s'arrêtait dès la fin du 1er tour. Corrigé en mettant le `return` au même niveau que le `for`. Sans le test avec l'exemple du cours, je ne l'aurais pas vu tout de suite.
