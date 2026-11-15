@@ -107,6 +107,8 @@ Oui, mais de justesse, et seulement avec les parties contre soi-même. Sans elle
 
 **Impasse 2 : la partie s'arrêtait après un tour.** Le test donnait `(0, 5)` au lieu de `(18, 23)` : c'est le score d'un seul tour (TFT coopère, ALL-D trahit). Le `return score1, score2` était indenté *dans* la boucle `for`, donc la fonction s'arrêtait dès la fin du 1er tour. Corrigé en mettant le `return` au même niveau que le `for`. Sans le test avec l'exemple du cours, je ne l'aurais pas vu tout de suite.
 
+**Impasse 3 : tableau des duels rempli de 0.** Quand j'ai ajouté le tableau des duels, toutes les cases valaient 0. J'avais oublié les lignes `somme_a += s1` et `somme_b += s2` : les sommes restaient à 0. Corrigé en ajoutant le cumul dans la boucle des 5 parties.
+
 ## 4. Étape 2 : nouvelles stratégies
 
 J'ajoute deux stratégies absentes du cours, choisies parce qu'elles sont opposées sur la question du pardon.
@@ -128,3 +130,57 @@ J'ajoute deux stratégies absentes du cours, choisies parce qu'elles sont oppos�
 ### Prédiction (écrite avant le lancement)
 
 À l'étape 1, TIT-FOR-TAT était la seule stratégie gentille, et elle ne gagnait que grâce à son match contre elle-même. Avec GRIM et TFT-GÉNÉREUX, il y a maintenant trois stratégies qui ne trahissent jamais en premier : elles devraient coopérer entre elles et marquer 600 points par partie, donc je pense que les trois vont prendre les premières places. Je pense que TFT-GÉNÉREUX sera devant TIT-FOR-TAT, parce que son pardon peut casser l'alternance contre TESTER et les représailles contre JOSS. GRIM devrait être juste derrière, car elle ne pardonne jamais à JOSS. ALL-D devrait descendre au classement : elle marque toujours environ 400 contre ceux qui ripostent, mais les stratégies gentilles marquent maintenant 600 entre elles. RANDOM et JOSS devraient rester en bas.
+
+### Résultats
+
+Commande : `py etape2.py`
+
+![Résultat de l'étape 2](captures/etape2.png)
+
+    === Avec parties contre soi-même ===
+    1 GRIM 18503
+    2 TFT-GENEREUX 18482
+    3 TIT-FOR-TAT 18068
+    4 TESTER 15996
+    5 ALL-D 15794
+    6 JOSS 15416
+    7 RANDOM 14626
+
+    Score moyen par partie (ligne contre colonne) :
+                    ALL-D   RANDOM TIT-FOR-   TESTER     JOSS     GRIM TFT-GENE
+    ALL-D             400      688      403      400      402      403      462
+    RANDOM            208      499      503      499      472      212      532
+    TIT-FOR-TAT       398      502      600      500      414      600      600
+    TESTER            400      501      500      400      405      401      592
+    JOSS              398      522      419      405      406      416      517
+    GRIM              398      686      600      401      416      600      600
+    TFT-GENEREUX      358      478      600      587      473      600      600
+
+    === Sans parties contre soi-même ===
+    1 GRIM 15540
+    2 TFT-GENEREUX 15539
+    3 TIT-FOR-TAT 15082
+    4 TESTER 14003
+    5 ALL-D 13794
+    6 JOSS 13512
+    7 RANDOM 12094
+
+### Comparaison avec l'étape 1
+
+- **Les trois stratégies gentilles prennent les trois premières places**, et le classement ne change plus quand on enlève les parties contre soi-même. À l'étape 1, ce choix inversait TIT-FOR-TAT et ALL-D. La raison : les stratégies gentilles ont maintenant des partenaires avec qui coopérer, et chaque match entre elles vaut 600 points.
+- **ALL-D passe de la 2e à la 5e place.** Elle marque toujours environ 400 contre ceux qui ripostent, mais ses concurrentes marquent maintenant 600 entre elles. C'est le même mécanisme que le mini-tournoi du cours (deux TFT et un ALL-D).
+- **TIT-FOR-TAT reste devant ALL-D dans tous les cas**, alors qu'à l'étape 1 c'était fragile : son succès dépend bien de la population.
+
+### Analyse des nouvelles stratégies
+
+- **GRIM (1re)** : elle profite de RANDOM. Dès que RANDOM trahit une fois, GRIM trahit pour toujours et l'exploite comme ALL-D (686 points, contre 502 pour TIT-FOR-TAT). Contre JOSS, son absence de pardon lui coûte un peu (416).
+- **TFT-GÉNÉREUX (2e)** : le pardon casse les représailles. Contre TESTER, elle fait 587 au lieu de 500 pour TIT-FOR-TAT, car l'alternance est cassée. Contre JOSS, 473 au lieu de 414. Mais le pardon a un coût : contre ALL-D, elle fait 358 au lieu de 398, car chaque pardon donne 5 points à ALL-D.
+- **GRIM et TFT-GÉNÉREUX sont à égalité** : 21 points d'écart avec les parties contre soi-même, et 1 seul point sans elles. L'écart est trop faible pour dire laquelle est la meilleure : avec une autre graine aléatoire, l'ordre pourrait s'inverser.
+
+### Comparaison avec ma prédiction
+
+- Les trois stratégies gentilles aux premières places : **juste**.
+- TFT-GÉNÉREUX devant TIT-FOR-TAT : **juste**, grâce au pardon contre TESTER et JOSS.
+- GRIM juste derrière : **faux**, elle est première (à égalité avec TFT-GÉNÉREUX). Je n'avais pas pensé que GRIM exploiterait RANDOM après sa première trahison.
+- ALL-D descend : **juste** (de la 2e à la 5e place).
+- RANDOM et JOSS en bas : **juste**

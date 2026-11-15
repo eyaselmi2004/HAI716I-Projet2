@@ -66,3 +66,29 @@ STRATEGIES_COURS = {
     'TESTER': tester,
     'JOSS': joss,
 }
+
+# GRIM : coopère tant que l'adversaire n'a jamais trahi,
+# puis trahit pour toujours dès sa première trahison (aucun pardon)
+def grim(mes_coups, coups_adv):
+    if 'D' in coups_adv:    # l'adversaire a trahi au moins une fois dans la partie
+        return 'D'          # -> on ne lui pardonne jamais
+    return 'C'
+
+
+# TFT-GENEREUX : comme TIT-FOR-TAT, mais quand l'adversaire trahit,
+# on lui pardonne 1 fois sur 10 (on rejoue C au lieu de riposter)
+def tft_genereux(mes_coups, coups_adv):
+    if len(coups_adv) == 0:         # 1er tour : on coopère
+        return 'C'
+    if coups_adv[-1] == 'C':        # l'adversaire a coopéré -> on coopère aussi
+        return 'C'
+    # l'adversaire a trahi : normalement on riposte (D)...
+    if random.random() < 0.1:       # ... sauf 1 fois sur 10 où on pardonne
+        return 'C'
+    return 'D'
+
+STRATEGIES_ETAPE2 = {
+    **STRATEGIES_COURS,
+    'GRIM': grim,
+    'TFT-GENEREUX': tft_genereux,
+}
