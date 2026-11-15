@@ -184,3 +184,22 @@ Commande : `py etape2.py`
 - GRIM juste derrière : **faux**, elle est première (à égalité avec TFT-GÉNÉREUX). Je n'avais pas pensé que GRIM exploiterait RANDOM après sa première trahison.
 - ALL-D descend : **juste** (de la 2e à la 5e place).
 - RANDOM et JOSS en bas : **juste**
+
+## 5. Étape 3 : modifications du tournoi
+
+Je garde les 7 stratégies de l'étape 2 et j'applique deux modifications, chacune séparément.
+
+| Modification | Paramètres | Pourquoi ce choix |
+|---|---|---|
+| **Bruit** | chaque coup est inversé avec une probabilité de 5 % (environ 10 erreurs par joueur sur 200 tours) | Le cours (diapositive 72) montre que le bruit provoque des représailles en écho entre deux TIT-FOR-TAT. C'est aussi un bon test pour mes deux stratégies : GRIM ne pardonne jamais, TFT-GÉNÉREUX pardonne. |
+| **Autres gains** | chasse au cerf (matrice du cours, section 07) : C/C = 4, D/C = 3, D/D = 1, C/D = 0 | On change l'ordre des préférences : coopérer à deux devient le meilleur résultat, il n'y a plus de tentation de trahir. Je peux prédire le résultat avec les équilibres de Nash vus en cours. |
+
+Je n'ai pas choisi l'horizon inconnu, car aucune de mes stratégies ne regarde le numéro du tour : il ne changerait presque rien. Je n'ai pas choisi la sélection, qui demandait plus de code que le temps disponible.
+
+### Prédiction 1 : bruit (écrite avant le lancement)
+
+Je pense que **GRIM va beaucoup baisser** : une seule erreur de l'adversaire suffit pour qu'elle trahisse jusqu'à la fin, donc ses matchs à 600 contre TIT-FOR-TAT, TFT-GÉNÉREUX et elle-même vont s'effondrer. **TIT-FOR-TAT va aussi baisser** : comme dans le cours, une erreur entre deux TIT-FOR-TAT déclenche un écho de représailles, et je m'attends à ce que son score contre elle-même passe de 600 à environ 450. **TFT-GÉNÉREUX devrait le mieux résister**, car son pardon arrête les échos : je pense qu'elle sera première. **ALL-D devrait remonter**, car elle trahit déjà tout le temps : le bruit la gêne peu, alors qu'il fait perdre des points aux autres.
+
+### Prédiction 2 : chasse au cerf (écrite avant le lancement)
+
+Avec la méthode des meilleures réponses : si l'adversaire coopère, la meilleure réponse est de coopérer (4 > 3) ; s'il trahit, c'est de trahir (1 > 0). Il y a donc **deux équilibres de Nash : (C, C) et (D, D)**, et trahir un coopérateur rapporte moins que coopérer (3 < 4). Je pense donc que **ALL-D va finir dernière** : contre les stratégies qui ripostent, elle ne marque plus que 1 point par tour, et contre les coopérateurs 3 au lieu de 4. **TESTER et JOSS devraient aussi baisser**, car leurs trahisons ne rapportent plus rien et déclenchent des représailles. **Les trois stratégies gentilles** (GRIM, TFT-GÉNÉREUX, TIT-FOR-TAT) devraient rester en tête, avec un écart encore plus grand qu'à l'étape 2.
