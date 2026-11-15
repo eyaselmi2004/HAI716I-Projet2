@@ -5,4 +5,4 @@
 from moteur import partie
 from strategies import all_d, tit_for_tat
 
-print(partie(tit_for_tat, all_d, 10))   # on doit voir (18, 23)
+print(partie(tit_for_tat, all_d, 10))   

@@ -20,6 +20,7 @@ Projet réalisé seule. Langage : Python.
 
 Avant de lancer le tournoi, j'ai vérifié le moteur avec l'exemple du cours (diapositive 67) : sur 10 tours, TIT-FOR-TAT contre ALL-D doit donner 18 contre 23.
 Commande : `py test.py`, résultat obtenu : `(18, 23)`. Le moteur calcule bien les points.
+Après avoir ajouté le bruit et la matrice de la chasse au cerf au moteur (étape 3), j'ai relancé `test.py`, `etape1.py` et `etape2.py` : les résultats sont identiques, les modifications n'ont rien cassé.
 
 ## 2. Les stratégies du cours
 
@@ -203,3 +204,50 @@ Je pense que **GRIM va beaucoup baisser** : une seule erreur de l'adversaire suf
 ### Prédiction 2 : chasse au cerf (écrite avant le lancement)
 
 Avec la méthode des meilleures réponses : si l'adversaire coopère, la meilleure réponse est de coopérer (4 > 3) ; s'il trahit, c'est de trahir (1 > 0). Il y a donc **deux équilibres de Nash : (C, C) et (D, D)**, et trahir un coopérateur rapporte moins que coopérer (3 < 4). Je pense donc que **ALL-D va finir dernière** : contre les stratégies qui ripostent, elle ne marque plus que 1 point par tour, et contre les coopérateurs 3 au lieu de 4. **TESTER et JOSS devraient aussi baisser**, car leurs trahisons ne rapportent plus rien et déclenchent des représailles. **Les trois stratégies gentilles** (GRIM, TFT-GÉNÉREUX, TIT-FOR-TAT) devraient rester en tête, avec un écart encore plus grand qu'à l'étape 2.
+
+### Résultats 1 : bruit
+
+Commande : `py etape3.py` (première partie de l'affichage)
+
+![Bruit de 5 %](captures/bruit.png)
+
+    1 GRIM 16678
+    2 ALL-D 16575
+    3 TESTER 16498
+    4 TFT-GENEREUX 16389
+    5 TIT-FOR-TAT 16316
+    6 JOSS 16150
+    7 RANDOM 14788
+
+**Comparaison avec ma prédiction.**
+- *Juste au niveau des matchs* : GRIM s'effondre contre les stratégies gentilles (contre TIT-FOR-TAT : 600 → 445, contre elle-même : 600 → 425). TIT-FOR-TAT contre elle-même passe de 600 à 487 à cause des échos (j'avais prédit environ 450). TFT-GÉNÉREUX garde le meilleur score contre elle-même (558) : son pardon arrête bien les échos. ALL-D remonte de la 5e à la 2e place.
+- *Faux au niveau du classement* : je pensais que GRIM baisserait beaucoup et que TFT-GÉNÉREUX serait première. C'est GRIM qui est première, et TFT-GÉNÉREUX n'est que 4e.
+
+**Pourquoi.** Avec le bruit, plus aucun match n'atteint 600 : le meilleur score du tableau est 558. Les stratégies gentilles perdent donc leur avantage, puisque leurs matchs à 600 disparaissent. Après une erreur de l'adversaire, GRIM se comporte comme ALL-D, et dans ce monde bruité, trahir ne coûte presque plus rien. GRIM garde en plus son gain contre RANDOM (685) et profite du pardon de TFT-GÉNÉREUX (506). À l'inverse, TFT-GÉNÉREUX se fait exploiter à chaque pardon par ALL-D (354) et par GRIM (370). J'avais raisonné seulement sur les matchs entre stratégies gentilles, sans penser que le bruit transforme GRIM en traître.
+
+**Limite.** Les scores sont très proches : 2 % d'écart entre la 1re et la 5e place. Le classement exact dépend du hasard des erreurs et pourrait changer avec une autre graine. Seule la dernière place de RANDOM est nette.
+
+### Résultats 2 : chasse au cerf
+
+Commande : `py etape3.py` (deuxième partie de l'affichage)
+
+![Chasse au cerf](captures/cerf.png)
+
+    1 TFT-GENEREUX 20497
+    2 TIT-FOR-TAT 17663
+    3 GRIM 17186
+    4 TESTER 11249
+    5 RANDOM 11018
+    6 JOSS 9517
+    7 ALL-D 8196
+
+**Comparaison avec ma prédiction : juste.**
+- ALL-D est dernière, comme prévu par les équilibres de Nash : trahir un coopérateur rapporte moins que coopérer (3 < 4), et contre les stratégies qui ripostent elle ne marque que 1 point par tour (environ 200 par partie).
+- TESTER et JOSS baissent : leurs trahisons ne rapportent plus rien et déclenchent des représailles.
+- Les trois stratégies gentilles restent en tête, avec un écart beaucoup plus grand qu'à l'étape 2 (20497 pour la 1re contre 11249 pour la 4e).
+
+**Ce que je n'avais pas prévu : TFT-GÉNÉREUX domine largement.** Dans la chasse au cerf, coopérer vaut 4 points par tour, donc chaque représaille coûte très cher. Contre TESTER, TIT-FOR-TAT tombe dans l'alternance et ne marque que 300 (1,5 par tour), alors que TFT-GÉNÉREUX casse l'alternance grâce au pardon et marque 745. Contre JOSS, c'est 379 au lieu de 230. Le pardon est donc bien plus rentable ici qu'au dilemme.
+
+### Bilan de l'étape 3
+
+Les deux modifications montrent que la meilleure stratégie dépend du contexte. Avec du bruit, l'avantage d'être gentil disparaît presque, et une stratégie rancunière comme GRIM s'en sort le mieux. Dans la chasse au cerf, où la coopération rapporte beaucoup, c'est au contraire la stratégie qui pardonne (TFT-GÉNÉREUX) qui gagne nettement. TIT-FOR-TAT n'est première dans aucune des deux.

@@ -8,8 +8,18 @@ GAINS={
     ('D', 'D'): (2, 2), #les 2 trahissent
 }
 
+
+# étape 3 : chasse au cerf (cours, section 07) : C,C > D,C > D,D > C,D
+# ici coopérer à deux est le meilleur résultat, il n'y a plus de "tentation"
+CHASSE_AU_CERF = {
+    ('C', 'C'): (4, 4),   # les 2 coopèrent -> meilleur résultat
+    ('C', 'D'): (0, 3),   # je coopère, il trahit
+    ('D', 'C'): (3, 0),   # je trahis, il coopère -> rapporte MOINS que coopérer (3 < 4)
+    ('D', 'D'): (1, 1),   # les 2 trahissent
+}
+
 #une strategie(strat) =une fonction qui prend (mes_coups, coups_adv) et qui renvoie 'C' ou 'D'
-def partie(strat1, strat2, n_tours=200):
+def partie(strat1, strat2, n_tours=200, gains=GAINS, bruit=0):
     coups1 = [] #liste des coups joues par le joueur 1 (son historique)
     coups2 = [] #celle de joueur 2
     score1 = 0
@@ -17,8 +27,17 @@ def partie(strat1, strat2, n_tours=200):
     for t in range(n_tours):
         c1 = strat1(coups1, coups2)
         c2 = strat2(coups2, coups1)
+
+        # étape 3 : bruit -> chaque coup a une petite chance d'être inversé
+        # (comme une erreur : le joueur voulait C mais c'est D qui est joué)
+        if bruit > 0:
+            if random.random() < bruit:
+                c1 = 'D' if c1 == 'C' else 'C'   # on inverse le coup du joueur 1
+            if random.random() < bruit:
+                c2 = 'D' if c2 == 'C' else 'C'   # on inverse le coup du joueur 2
+
         # on regarde dans la matrice combien chacun gagne
-        g1, g2= GAINS[(c1,c2)]
+        g1, g2 = gains[(c1, c2)]   # gains = la matrice choisie (dilemme ou chasse au cerf)
         score1 += g1
         score2 += g2
 
@@ -32,7 +51,7 @@ def partie(strat1, strat2, n_tours=200):
 #le tournoi 
 # graine :pour que le hasard soit toujours le meme (resultats reproductibles)
 # contre_soi :true si chaque strategie joue aussi contre une copie d'elle-meme
-def tournoi(strategies, n_parties=5, n_tours=200, graine=42, contre_soi=True ):
+def tournoi(strategies, n_parties=5, n_tours=200, graine=42, contre_soi=True, gains=GAINS, bruit=0):
     random.seed(graine)
     noms = list(strategies.keys())
 
@@ -58,9 +77,9 @@ def tournoi(strategies, n_parties=5, n_tours=200, graine=42, contre_soi=True ):
             somme_a = 0  #total de a sur les 5 parties contre b
             somme_b = 0  #total de b sur les 5 parties contre a
             
-                        # 5 parties de 200 tours pour chaque paire
+            # 5 parties de 200 tours pour chaque paire
             for p in range(n_parties):
-                s1, s2 = partie(strategies[a], strategies[b], n_tours)
+                s1, s2 = partie(strategies[a], strategies[b], n_tours, gains, bruit)
                 somme_a += s1   # on cumule les points de a contre b sur les 5 parties
                 somme_b += s2   # pareil pour b contre a
                 if a == b:
